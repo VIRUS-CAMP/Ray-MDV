@@ -9,7 +9,7 @@ WhatsApp bot wenye njia mbili:
 ## Kuanza:
 
 ```bash
-git clone https://github.com/yourusername/mjeshi-bot.git
+git clone https://github.com/VIRUS-CAMP/Ray-MDV.git
 cd mjeshi-bot
 cp .env.example .env
 npm install
