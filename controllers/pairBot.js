@@ -9,29 +9,46 @@ const connectBot = async () => {
   const { state, saveCreds } = await useMultiFileAuthState("baileys_auth");
   sock = makeWASocket({ auth: state });
 
+  // Hifadhi credentials kila mara inapobadilika
   sock.ev.on("creds.update", saveCreds);
 
   sock.ev.on("connection.update", (update) => {
     const { connection, lastDisconnect } = update;
+
     if (connection === "close") {
-      const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
-      if (shouldReconnect) connectBot();
-    } else if (connection === "open") {
-      console.log("📞 Phone Number Bot is ready");
+      const shouldReconnect = (lastDisconnect?.error instanceof Boom)
+        ? lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
+        : true;
+
+      if (shouldReconnect) {
+        console.log("🔁 Kuunganisha tena Pair Bot...");
+        connectBot();
+      } else {
+        console.log("❌ Pair Bot imekatishwa.");
+      }
+    }
+
+    if (connection === "open") {
+      console.log("📞 Pair Bot imeunganishwa kikamilifu kwa kutumia namba ya simu!");
     }
   });
 
   sock.ev.on("messages.upsert", async (m) => {
     const msg = m.messages[0];
     if (!msg.message || msg.key.fromMe) return;
-    await sock.sendMessage(msg.key.remoteJid, { text: "Nipo mbabe! 🤖" });
+
+    // Jibu la awali kwa ujumbe wowote
+    await sock.sendMessage(msg.key.remoteJid, {
+      text: "Hujambo! Nipo mbabe kupitia pairing ya simu. 🤖",
+    });
   });
 };
 
 connectBot();
 
+// Route ya kuthibitisha bot inafanya kazi
 router.get('/', (req, res) => {
-  res.send("✅ Phone Number Bot is running...");
+  res.send("✅ Pair Bot (kwa simu) inafanya kazi vizuri...");
 });
 
 module.exports = router;
